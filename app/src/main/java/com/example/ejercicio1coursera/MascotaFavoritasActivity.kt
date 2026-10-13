@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 
 class MascotasFavoritasActivity : ComponentActivity() {
 
+    private lateinit var lista: RecyclerView
+    private lateinit var mensajeVacio: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,7 +36,7 @@ class MascotasFavoritasActivity : ComponentActivity() {
             textSize = 30f
             gravity = Gravity.CENTER
             setTextColor(Color.rgb(77, 62, 66))
-            contentDescription = "Regresar a mascotas"
+            contentDescription = "Regresar"
             setOnClickListener { finish() }
         }
 
@@ -43,23 +46,26 @@ class MascotasFavoritasActivity : ComponentActivity() {
         )
 
         val titulo = TextView(this).apply {
-            text = "★  Mascotas favoritas"
+            text = "★ Últimas 5 mascotas"
             textSize = 21f
             setTextColor(Color.rgb(77, 62, 66))
         }
 
         barra.addView(titulo)
-
         raiz.addView(barra)
 
-        val lista = RecyclerView(this).apply {
+        mensajeVacio = TextView(this).apply {
+            text = "Todavía no tienes mascotas votadas."
+            textSize = 17f
+            gravity = Gravity.CENTER
+            setPadding(dp(16), dp(20), dp(16), dp(20))
+        }
+
+        raiz.addView(mensajeVacio)
+
+        lista = RecyclerView(this).apply {
             layoutManager = LinearLayoutManager(
                 this@MascotasFavoritasActivity
-            )
-
-            adapter = MascotaAdapter(
-                MascotasData.favoritasDummy,
-                permitirVotos = false
             )
 
             setPadding(dp(14), dp(12), dp(14), dp(20))
@@ -76,5 +82,26 @@ class MascotasFavoritasActivity : ComponentActivity() {
         )
 
         setContentView(raiz)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        MascotasRepository.cargarFavoritas(this) { mascotas ->
+            if (!isFinishing && !isDestroyed) {
+
+                lista.adapter = MascotaAdapter(
+                    mascotas = mascotas,
+                    permitirVotos = false
+                )
+
+                mensajeVacio.visibility =
+                    if (mascotas.isEmpty()) {
+                        android.view.View.VISIBLE
+                    } else {
+                        android.view.View.GONE
+                    }
+            }
+        }
     }
 }

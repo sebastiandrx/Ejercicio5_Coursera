@@ -6,7 +6,8 @@ data class Mascota(
     val nombre: String,
     val imagen: String,
     val colorFondo: Int,
-    var rating: Int
+    var rating: Int,
+    var ultimoRating: Long = 0L
 )
 
 object MascotasData {

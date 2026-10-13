@@ -24,10 +24,13 @@ fun fondoRedondeado(
         cornerRadius = radio
     }
 
+
 class MascotaAdapter(
     private val mascotas: List<Mascota>,
-    private val permitirVotos: Boolean = true
+    private val permitirVotos: Boolean = true,
+    private val onVotar: ((Mascota) -> Unit)? = null
 ) : RecyclerView.Adapter<MascotaAdapter.MascotaViewHolder>() {
+
 
     class MascotaViewHolder(
         val contenedor: LinearLayout,
@@ -123,12 +126,17 @@ class MascotaAdapter(
 
         holder.votar.setOnClickListener(null)
 
+
         if (permitirVotos) {
             holder.votar.setOnClickListener {
                 mascota.rating += 1
+
                 holder.contador.text = mascota.rating.toString()
+
+                onVotar?.invoke(mascota.copy())
             }
         }
+
     }
 
     override fun getItemCount(): Int = mascotas.size
